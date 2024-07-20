@@ -1,0 +1,78 @@
+/* @font-face {
+  font-family: "Koulen";
+  src: url("./../../Assets/fonts/Koulen-Regular.ttf");
+}
+body{
+  font-family: "Koulen";
+} */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  justify-content:space-between;
+}
+.header .logo a img {
+  background: transparent;
+  border-radius: 0px;
+  width: 130px;
+}
+.header .others {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+  width: 14%;
+  margin-top: -17px;
+}
+.header .others .navlogos button{
+  padding: 5px 20px;
+  border: 1px solid black;
+  border-radius: 50px;
+  margin: 0px;
+  font-size: 18px;
+  margin-right: 20px;
+  
+}
+.header .others .navlogos img {
+  width: 44px;
+}
+.header .others .navlogos .cart-count{
+  width: 15px;
+  height: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -50px;
+  margin-left: 140px;
+  border-radius: 11px;
+  font-size: 14px;
+  background: red;
+  color: white;
+}
+nav ul li {
+  list-style: none;
+  display: inline-block;
+  color: #000;
+  font-size: 20px;
+}
+nav ul li a {
+  color: black;
+  position: relative;
+  padding: 5px 0;
+}
+nav .navbar ul li a:hover {
+  color: black;
+}
+nav ul li a:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: black;
+  transition: 0.3s;
+  bottom: 0;
+}
+nav ul li a:hover:after {
+  width: 100%;
+}

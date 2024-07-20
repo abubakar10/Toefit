@@ -1,0 +1,130 @@
+
+.section2 {
+  padding-bottom: 100px;
+}
+.section2 h2 {
+  text-align: center;
+  padding: 40px 0px;
+}
+.categories {
+  display: grid;
+  /* grid-template-columns: repeat(2, 1fr);
+
+  justify-items:;
+  align-items: center;
+  grid-gap: 10px; */
+  
+  /* padding: 0px 78px; */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.categories .men {
+  width: 40%;
+  position: relative;
+  padding-bottom: 30px;
+  overflow: hidden;
+  
+}
+.categories .women {
+  width: 40%;
+  position: relative;
+  padding-bottom: 30px;
+  
+}
+.categories .kids {
+  width: 40%;
+  position: relative;
+  
+}
+.categories .sale {
+  width: 40%;
+  position: relative;
+  overflow: hidden;
+}
+
+.categories .men img {
+  width: 100%;
+  transition: transform 0.3s ease;
+  border-radius: 50px;
+  height: 700px;
+}
+.categories .men:hover img {
+  transform: scale(1.03);
+  border-radius: 50px;
+}
+.categories .women img {
+  width: 100%;
+  transition: transform 0.3s ease;
+  border-radius: 50px;
+  height: 700px;
+}
+.categories .women:hover img {
+  transform: scale(1.03); /* Adjust the scale factor as needed */
+}
+.categories .kids img {
+  width: 100%;
+  transition: transform 0.3s ease;
+  border-radius: 50px;
+  height: 700px;
+}
+.categories .kids:hover img {
+  transform: scale(1.03); /* Adjust the scale factor as needed */
+}
+.categories .sale img {
+  width: 100%;
+  transition: transform 0.3s ease;
+  border-radius: 50px;
+  height: 700px;
+}
+.categories .sale:hover img {
+  transform: scale(1.03); /* Adjust the scale factor as needed */
+}
+.categories .men .menbtn{
+  display: flex;
+  justify-content: center;
+}
+.categories .men .menbtn button{
+  position: absolute;
+  top: 588px;
+  /* left: 310px; */
+  padding: 10px 60px 10px 60px;
+  border: none;
+  border-radius: 4px;
+}
+.categories .women .womenbtn{
+  display: flex;
+  justify-content: center;
+}
+.categories .women .womenbtn button{
+  position: absolute;
+  top: 588px;
+  padding: 10px 60px 10px 60px;
+  border: none;
+  border-radius: 4px;
+}
+.categories .kids .kidsbtn{
+  display: flex;
+  justify-content: center;
+}
+.categories .kids .kidsbtn button{
+  position: absolute;
+  top: 588px;
+  padding: 10px 60px 10px 60px;
+  border: none;
+  border-radius: 4px;
+}
+.categories .sale .salebtn{
+  display: flex;
+  justify-content: center;
+}
+.categories .sale .salebtn button{
+  position: absolute;
+  top: 588px;
+  padding: 10px 60px 10px 60px;
+  border: none;
+  border-radius: 4px;
+}
