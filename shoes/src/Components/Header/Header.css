@@ -1,10 +1,4 @@
-/* @font-face {
-  font-family: "Koulen";
-  src: url("./../../Assets/fonts/Koulen-Regular.ttf");
-}
-body{
-  font-family: "Koulen";
-} */
+  
 .header {
   display: flex;
   align-items: center;
@@ -24,6 +18,11 @@ body{
   width: 14%;
   margin-top: -17px;
 }
+.header .others .navlogos{
+  display: flex;
+  align-items: center;
+  column-gap: 20px;
+}
 .header .others .navlogos button{
   padding: 5px 20px;
   border: 1px solid black;
@@ -33,17 +32,21 @@ body{
   margin-right: 20px;
   
 }
-.header .others .navlogos img {
+.header .others .navlogos .user-reg{
+  margin-top: 30px;
+  font-size: 30px;
+}
+.header .others .navlogos .cart img {
   width: 44px;
 }
-.header .others .navlogos .cart-count{
+.header .others .navlogos .cart .cart-count{
   width: 15px;
   height: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-top: -50px;
-  margin-left: 140px;
+  margin-left: 40px;
   border-radius: 11px;
   font-size: 14px;
   background: red;

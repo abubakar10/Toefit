@@ -20,7 +20,7 @@ const Layout = ({children,title,description,author,keywords }) => {
 Layout.defaultProps={
     title :"Toefit",
     description:"shoe store",
-    keywords: "shoes,ladies,mens,sale,bridal",
+    keywords: "shoes,ladies,mens,sale",
     author: "Abubakar shafeeq, Husnain Salamat"
 }
 

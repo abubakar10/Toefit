@@ -1,4 +1,6 @@
-
+*{
+  text-transform: none;
+}
 .section3 {
   padding: 100px 20px;
 }

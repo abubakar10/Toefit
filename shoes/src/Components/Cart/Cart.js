@@ -1,254 +1,200 @@
-
-import React, { useState } from "react";
-import "./Cart.css";
-import TextField from '@mui/material/TextField';
-import { useSelector, useDispatch } from "react-redux";
-import { addItemToCart, removeItemFromCart } from "../../Actions/CartAction.jsx";
-import { Typography } from "@mui/material/core";
-import Button from '@mui/material/Button';
-import {Done} from "@mui/icons-material"
-import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart.js';
-import { Link } from "react-router-dom";
-// import MetaData from "../layouts/MataData/MataData";
-// import { useNavigate } from "react-router-dom";
+import React, { useState,useEffect } from "react";
+import Layout from "./../Layout/Layout.js";
+import { useCart } from "../../Context/CartProvider.js";
+import { useAuth } from "../../Context/Auth.js";
 import { useNavigate } from "react-router-dom";
-import CartItem from "./CartItem.jsx";
-import {
-  dispalyMoney,
-  generateDiscountedPrice,
-} from "../DisplayMoney/DisplayMoney.jsx";
+import DropIn from 'braintree-web-drop-in-react';
+import axios from "axios";
+import toast from "react-hot-toast";
 const Cart = () => {
-  const history = useNavigate();
-  const dispatch = useDispatch();
-  const { cartItems } = useSelector((state) => state.cart);
+  const [auth, setAuth] = useAuth();
+  const [cart, setCart] = useCart();
+  const [clientToken,setClientToken]=useState("")
+  const [instance, setInstance] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // new code
-  const [couponCode, setCouponCode] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
-  const [isValid, setIsValid] = useState(true);
-
-  // new code end
-
-  const increaseQuantity = (id, quantity, stock) => {
-    const newQty = quantity + 1;
-    if (stock <= quantity) {
-      return;
-    } else {
-      dispatch(addItemToCart(id, newQty));
+  //total price
+  const totalPrice = () => {
+    try {
+      let total = 0;
+      cart?.map((item) => {
+        total = total + item.price;
+      });
+      return total.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  //detele item
+  const removeCartItem = (pid) => {
+    try {
+      let myCart = [...cart];
+      let index = myCart.findIndex((item) => item._id === pid);
+      myCart.splice(index, 1);
+      setCart(myCart);
+      localStorage.setItem("cart", JSON.stringify(myCart));
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  const decreaseQuantity = (id, quantity) => {
-    const newQty = quantity - 1;
-    if (1 >= quantity) {
-      return;
+  //get payment gateway token
+  const getToken = async () => {
+    try {
+      const { data } = await axios.get("/api/v1/product/braintree/token");
+      setClientToken(data?.clientToken);
+    } catch (error) {
+      console.log(error);
     }
-
-    dispatch(addItemToCart(id, newQty));
   };
 
-  // new code
-  const handleApplyCoupon = () => {
-    // handle apply coupon logic
-    setIsValid(false);
+  useEffect(() => {
+    getToken();
+  }, [auth?.token]);
+
+  //handle payments
+  const handlePayment = async () => {
+    try {
+      setLoading(true);
+      const { nonce } = await instance.requestPaymentMethod();
+      const { data } = await axios.post("/api/v1/product/braintree/payment", {
+        nonce,
+        cart,
+      });
+      setLoading(false);
+      localStorage.removeItem("cart");
+      setCart([]);
+      navigate("/dashboard/user/orders");
+      toast.success("Payment Completed Successfully ");
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   };
-
-  const handleFocus = (event) => {
-    setIsFocused(event.target.value !== "");
-  };
-
-  // new code end
-
-  const deleteCartItems = (id) => {
-    dispatch(removeItemFromCart(id));
-  };
-
-  const checkoutHandler = () => {
-   
-    history.push("/login?redirect=/shipping");
-  };
-
-  // claculte price after discount
-  let totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
-  let discountedPrice = generateDiscountedPrice(totalPrice);
-  let totalDiscount = totalPrice - discountedPrice;
-  let final = totalPrice - totalDiscount;
-  final = dispalyMoney(final);
-  totalDiscount = dispalyMoney(totalDiscount);
-  totalPrice = dispalyMoney(totalPrice);
-
   return (
-    <>
-      <div className="cartPage">
-  {/* <MetaData title="Your Cart" />   */}
-        <div className="cart_HeaderTop">
-          <div className="headerLeft">
-            <Typography variant="h5" component="h1" className="cartHeading">
-              Shopping Cart
-            </Typography>
-            <Typography variant="body2" className="cartText3">
-              TOTAL ({cartItems.length} item) <b>{final}</b>
-            </Typography>
+    <Layout>
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-md-12">
+            <h1 className="text-center bg-light p-2 mb-1">
+              {`Hello ${auth?.token && auth?.user?.name}`}
+            </h1>
+            <h4 className="text-center">
+              {cart?.length
+                ? `You Have ${cart.length} items in your cart ${
+                    auth?.token ? "" : "please login to checkout"
+                  }`
+                : " Your Cart Is Empty"}
+            </h4>
           </div>
-          <Typography
-            variant="body2"
-            className="cartText2"
-            onClick={() => history.push("/products")}
-          >
-            Continue Shopping
-          </Typography>
         </div>
-
-        <div className="separator_cart2"></div>
-
-        {cartItems.length === 0 ? (
-          <div className="emptyCartContainer">
-            <RemoveShoppingCartIcon className="cartIcon" />
-
-            <Typography variant="h5" component="h1" className="cartHeading">
-              Your Shopping Cart is Empty
-            </Typography>
-            <Typography variant="body" className="cartText">
-              Nothin' to see here.
-            </Typography>
-            <Typography variant="body" className="cartText">
-              Let's get shopping!
-            </Typography>
-            <Link to="/products">
-              <Button className="shopNowButton">Shop Now</Button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="cart_content_wrapper">
-              <div className="cart_left_container">
-                {cartItems &&
-                  cartItems.map((item) => (
-                    <Link
-                      to="#"
-                      style={{ textDecoration: "none", color: "none" }}
-                    >
-                      <CartItem
-                        key={item.productId}
-                        item={item}
-                        deleteCartItems={deleteCartItems}
-                        decreaseQuantity={decreaseQuantity}
-                        increaseQuantity={increaseQuantity}
-                        length={cartItems.length}
-                        id = {item.productId}
-                      />
-                    </Link>
-                  ))}
-              </div>
-
-              <div className="separator_cart3"></div>
-              <div className="cart_right_container">
-                <div className="order_summary">
-                  <h4>
-                    Order Summary &nbsp; ( {cartItems.length}{" "}
-                    {cartItems.length > 1 ? "items" : "item"} )
-                  </h4>
-                  <div className="order_summary_details">
-                    <div className="price order_Summary_Item">
-                      <span>Original Price</span>
-                      {/* ORIGINAL PRICE TOATAL */}
-                      <p>{totalPrice}</p>
-                    </div>
-
-                    <div className="discount order_Summary_Item">
-                      <span>Discount</span>
-                      <p>
-                        <del>{totalDiscount}</del>
-                      </p>
-                    </div>
-
-                    <div className="delivery order_Summary_Item">
-                      <span>Delivery</span>
-                      <p>
-                        <b>Free</b>
-                      </p>
-                    </div>
-
-                    <div className="separator_cart"></div>
-                    <div className="total_price order_Summary_Item">
-                      <div>
-                        <h4>Total Price</h4>
-
-                        <p
-                          style={{
-                            fontSize: "14px",
-                            marginTop: "-10px",
-                            color: "#414141",
-                          }}
-                        >
-                          (Inclusive of all taxes)
-                        </p>
-                      </div>
-                      <p>
-                        <b>{final}</b>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="separator"></div>
-
-                <div className="coupon-box-wrapper">
-                  <div
-                    className={`coupon-box-content ${
-                      isFocused ? "focused" : ""
-                    }`}
-                  >
-                    <TextField
-                      label="Enter coupon code"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      onFocus={handleFocus}
-                      onBlur={() => setIsFocused(false)}
-                      error={!isValid}
-                      helperText={!isValid && "Invalid coupon code"}
-                      variant="outlined"
-                      size="small"
-                      style={{ width: "200px", marginRight: "1rem" }}
-                    />
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className="coupon-box-apply-btn"
-                      onClick={handleApplyCoupon}
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                </div>
-
-                <Button
-                  variant="contained"
-                  className="btn-custom"
-                  onClick={checkoutHandler}
-                >
-                  Checkout
-                </Button>
-
-                <div className="paymentLogoImg">
+        <div className="row">
+          <div className="col-md-8">
+            {cart?.map((p) => (
+              <div className="row mb-2 p-3 card flex-row w-75">
+                <div className="col-md-4">
                   <img
-                    src={require("../../Image/cart/cart_img.png")}
-                    alt="payemnt-icons"
-                    className="paymentImg"
+                    src={`http://localhost:8080/api/v1/product/product-photo/${p._id}`}
+                    className="card-img-top"
+                    alt={p.name}
+                    width="100px"
+                    height={"100px"}
                   />
                 </div>
+                <div className="col-md-8">
+                  <p>{p.name}</p>
+                  <p>{p.description.substring(0, 30)}</p>
+                  <p>Price : {p.price}</p>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => removeCartItem(p._id)}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
+            ))}
+          </div>
+          <div className=" col-md-4 text-center">
+            <h2>Cart Summary</h2>
+            <p>Total | Checkout | Payment</p>
+            <hr />
+            <h4 className="mb-100" >Total : {totalPrice()} </h4>
+            {auth?.user?.address ? (
+              <>
+                <div className="mb-3">
+                  <h4>Current Address</h4>
+                  <h5>{auth?.user?.address}</h5>
+                  <button
+                    className="btn btn-outline-warning"
+                    onClick={() => navigate("/dashboard/user/profile")}
+                  >
+                    Update Address
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="mb-3">
+                {auth?.token ? (
+                  <button
+                    className="btn btn-outline-warning"
+                    onClick={() => navigate("/dashboard/user/profile")}
+                  >
+                    Update Address
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-outline-warning"
+                    onClick={() =>
+                      navigate("/login", {
+                        state: "/cart",
+                      })
+                    }
+                  >
+                    Plase Login to checkout
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="mt-2">
+              {!clientToken || !cart?.length ? (
+                ""
+              ) : (
+                <>
+                  {/* <DropIn
+                    options={{
+                      authorization: clientToken,
+                      paypal: {
+                        flow: "vault",
+                      },
+                    }}
+                    onInstance={(instance) => setInstance(instance)}
+                  /> */}
+
+                  <button
+                    className="btn btn-primary"
+                    onClick={handlePayment}
+                    disabled={loading || !instance || !auth?.user?.address}
+                  >
+                    {loading ? "Processing ...." : "Make Payment"}
+                  </button>
+                </>
+              )}
             </div>
-          </>
-        )}
+          </div>
+        </div>
+        <div className="payment-links">
+         <a href="https://buy.stripe.com/test_14k7sT74HbIndhe7ss">Make Payment</a>
+
+        </div>
       </div>
-    </>
+    </Layout>
   );
 };
 
 export default Cart;
-
 

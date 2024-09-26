@@ -6,8 +6,20 @@ import logo from "./../../Assets/logos/logo.png";
 // import wishlistlogo from "./../../Assets/icons/heart.png";
 import cartlogo from "./../../Assets/icons/shopping-cart.png";
 import { Link } from 'react-router-dom';
-
+import { useAuth } from "../../Context/Auth.js";
+import toast from "react-hot-toast"
+import { useCart } from "../../Context/CartProvider.js";
+import { useState } from "react";
 const Header = () => {
+  const [auth,setAuth] =useAuth()
+  const[cart] =useCart()
+  const handleLogout =()=>{
+    setAuth({
+      ...auth,user:null,token:''
+    });
+    localStorage.removeItem('auth')
+    toast.success('Logout Successfully')
+  }
   return (
     <div className="header">
       <div className="logo">
@@ -52,11 +64,11 @@ const Header = () => {
                     Kids
                   </a>
                 </li>
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <a className="nav-link" href="/sale">
                     Sale
                   </a>
-                </li>
+                </li> */}
                 <li className="nav-item">
                   <a className="nav-link" href="/about">
                     About
@@ -69,14 +81,37 @@ const Header = () => {
       </div>
       <div className="others">
         <div className="navlogos">
-           <a href ="/login">
+        <div className="user-reg">
+           {
+            !auth.user ? (<><Link to ="/login">
              <button >Login</button>
-           </a>
+          
+
+           </Link></>) 
+           :(<>
+            <li  style={{ listStyleType: 'none' }} className="nav-item dropdown">
+             <Link className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {auth?.user?.name}
+             </Link>
+             <ul style={{ listStyleType: 'none' }} className="dropdown-menu" >
+            <li><Link to= {`/dashboard/${auth?.user?.role === 1 ? "admin" : "user"}`} className="dropdown-item" >Dashboard</Link></li>
+            <li><Link onClick={handleLogout} className="dropdown-item" to ="/login">
+             Logout
+           </Link>
+           </li>
+  </ul>
+</li>
+           </>)
+           }
+           </div>
+           <div className="cart">
           <Link to= "/cart">
               <img src={cartlogo} alt="" />
           </Link>
-          <div className="cart-count">0</div>
+          <div className="cart-count">{cart?.length}</div>
+          </div>
         </div>
+        
       </div>
     </div>
   );

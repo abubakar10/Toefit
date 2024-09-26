@@ -1,10 +1,13 @@
-@font-face {
+/* @font-face {
   font-family: "Koulen";
   src: url("./../../Assets/fonts/Koulen-Regular.ttf");
-}
-body{
+} */
+/* body{
   font-family: "Koulen";
-} 
+}  */
+/* *{
+  text-transform: none;
+} */
  .footer-contents{
   background-color: black;
   padding-bottom: 20px;

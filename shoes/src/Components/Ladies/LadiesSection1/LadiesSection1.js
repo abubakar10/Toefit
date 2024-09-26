@@ -2,9 +2,10 @@ import React, { useState } from 'react'
 import "./LadiesSection1.css"
 import LadiesProductData from "./LadiesProductData.js"
 import { IoCloseCircleSharp } from "react-icons/io5";
-
+import { useCart } from '../../../Context/CartProvider.js';
 
 const LadiesSection1 = () => {
+  const [cart,setCart]=useCart()
   const [detail, setDetail] = useState([]);
   const [close, setClose] = useState(false);
   const detailPage = (LadiesSection1) => {
@@ -31,7 +32,7 @@ const LadiesSection1 = () => {
                           <h2>{x.title}</h2>
                           <h3>$ {x.price}</h3>
                           <p>{x.description}</p>
-                          <button>Add To Cart</button>
+                          <button onClick={()=>setCart()}>Add To Cart</button>
                         </div>
                       </div>
                     </>
